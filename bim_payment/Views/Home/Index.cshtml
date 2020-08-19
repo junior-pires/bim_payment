@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<input type="button" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />
+<input type="button" value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />
+
+
+<script type="text/javascript">
+    function errorCallback(error) {
+        alert(JSON.stringify(error));
+    }
+    function cancelCallback() {
+        alert('Payment cancelled');
+    }
+
+    Checkout.configure({
+        session: {
+            id: 'SESSION0002298327206I33354192N2'
+        },
+        merchant: '22599',
+        order: {
+            amount: 100,
+            currency: 'USD',
+            description: 'Ordered goods',
+            id: '12DFsdsD3'
+        },
+        interaction: {
+            
+            merchant: {
+                name: 'Ernesto Junior Pires Alide',
+                address: {
+                    line1: 'NCL-B. BLOCO 1 Q. 04 C. 18 MOCAMBIQUE',
+                    line2: 'Avenida Julio Nherere, NCL, MOCAMBIQUE'
+                },
+                
+            }
+        }
+    });
+</script>
