@@ -11,19 +11,10 @@ namespace bim_payment.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(long id)
         {
 
-            RestClient restClient = new RestClient("https://test-gateway.mastercard.com");
-            RestRequest restRequest = new RestRequest("/api/rest/version/51/merchant/22599/session/", Method.POST);
-            restRequest.AddHeader("Content-Type", "application/json");
-            restRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6MzBlYzZkOGY1MmI3YzJiY2YzOGZkNWZlNzRjNDhkMzA=");
-
-            var data = new SessionRequest() { apiOperation= "CREATE_CHECKOUT_SESSION",interaction=new SessionRequest.Interaction() { operation= "VERIFY" },order=new SessionRequest.Order() {amount=100,currency="MZN",id="544231GF" } };
-            restRequest.AddJsonBody(data);
-            var response =  restClient.Execute<SessionResponse>(restRequest);
-            SessionResponse resposta = response.Data;
-            ViewBag.SessionId = resposta.Session.Id;
+            ViewBag.id = id;
             return View();
 
         }
@@ -55,8 +46,9 @@ namespace bim_payment.Controllers
             builder.Append(RandomString(2, false));
             return builder.ToString();
         }
-        public ActionResult PagarViaMasterCard(string SessioId)
+        public ActionResult PagarViaMasterCard(string SessioId, long id_produto)
         {
+            string status = "";
             string orderID = RandomStringNumber();
             string transationID = RandomStringNumber();
 
@@ -80,12 +72,23 @@ namespace bim_payment.Controllers
                 CaptureRequest.AddJsonBody(data2);
                 var captura = restClient.Execute<PayResponse>(CaptureRequest);
                 PayResponse capturacao = captura.Data;
-            }
-            
-           
-            //ViewBag.SessionId = resposta.Session.Id;
 
-            return Content("true");
+                if (capturacao.order.status == "CAPTURED")
+                {
+                     status = "CAPTURED";
+                }
+            }
+
+
+            if (status == "CAPTURED")
+            {
+                return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&oque_e=musica");
+                
+            }
+            else
+            {
+                return Redirect("/PubMusica/PagamentoFalhou?erro=sads");
+            }
         }
         public ActionResult About()
         {
