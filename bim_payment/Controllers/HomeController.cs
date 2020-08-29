@@ -11,10 +11,12 @@ namespace bim_payment.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index(long id)
+        public ActionResult Index(long id, decimal valor,string oque_e)
         {
 
             ViewBag.id = id;
+            ViewBag.valor = valor;
+            ViewBag.oque_e = oque_e;
             return View();
 
         }
@@ -46,9 +48,9 @@ namespace bim_payment.Controllers
             builder.Append(RandomString(2, false));
             return builder.ToString();
         }
-        public ActionResult PagarViaMasterCard(string SessioId, long id_produto)
+        public ActionResult PagarViaMasterCard(string SessioId, long id_produto,decimal valor,string oque_e)
         {
-            string status = "";
+            string status = "FAILED";
             string orderID = RandomStringNumber();
             string transationID = RandomStringNumber();
 
@@ -57,7 +59,7 @@ namespace bim_payment.Controllers
             authorizationRequest.AddHeader("Content-Type", "application/json");
             authorizationRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6MzBlYzZkOGY1MmI3YzJiY2YzOGZkNWZlNzRjNDhkMzA=");
 
-            var data = new PayRequest() { apiOperation = "AUTHORIZE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" }, order = new PayRequest.Order() { amount = 100, currency = "MZN" } };
+            var data = new PayRequest() { apiOperation = "AUTHORIZE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" }, order = new PayRequest.Order() { amount = valor, currency = "MZN" } };
             authorizationRequest.AddJsonBody(data);
             var response = restClient.Execute<PayResponse>(authorizationRequest);
             PayResponse Autorizacao = response.Data;
@@ -68,7 +70,7 @@ namespace bim_payment.Controllers
                 CaptureRequest.AddHeader("Content-Type", "application/json");
                 CaptureRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6MzBlYzZkOGY1MmI3YzJiY2YzOGZkNWZlNzRjNDhkMzA=");
 
-                var data2 = new PayRequest() { transaction = new PayRequest.Transaction() { amount = 100, currency = "MZN" }, apiOperation = "CAPTURE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" } };
+                var data2 = new PayRequest() { transaction = new PayRequest.Transaction() { amount = valor, currency = "MZN" }, apiOperation = "CAPTURE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" } };
                 CaptureRequest.AddJsonBody(data2);
                 var captura = restClient.Execute<PayResponse>(CaptureRequest);
                 PayResponse capturacao = captura.Data;
@@ -82,12 +84,14 @@ namespace bim_payment.Controllers
 
             if (status == "CAPTURED")
             {
-                return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&oque_e=musica");
+                return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&oque_e=" + oque_e);
+                //return Redirect("https://localhost:44360/payment/compra?id_produto=" + id_produto + "&oque_e="+ oque_e);
                 
             }
             else
             {
-                return Redirect("/PubMusica/PagamentoFalhou?erro=sads");
+
+                return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro="+status);
             }
         }
         public ActionResult About()

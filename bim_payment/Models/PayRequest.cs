@@ -18,12 +18,12 @@ namespace bim_payment.Models
         {
            public string currency { get; set; }
             public string id { get; set; }
-            public int amount { get; set; }
+            public decimal amount { get; set; }
         }
         public class Transaction
         {
             public string currency { get; set; }
-            public int amount { get; set; }
+            public decimal amount { get; set; }
         }
         public class SourceOfFunds
         {

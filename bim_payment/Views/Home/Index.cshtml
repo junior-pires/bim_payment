@@ -70,7 +70,7 @@
                     if ("ok" == response.status) {
                         debugger
                         //alert("Session updated with data: " + response.session.id);
-                        location.href = '/Home/PagarViaMasterCard?SessioId=' + response.session.id+"&id_produto=@ViewBag.id";
+                        location.href = '/Home/PagarViaMasterCard?SessioId=' + response.session.id+"&id_produto=@ViewBag.id&valor=@ViewBag.valor&oque_e=@ViewBag.oque_e";
                         //check if the security code was provided by the user
                         if (response.sourceOfFunds.provided.card.securityCode) {
                             console.log("Security code was provided.");
