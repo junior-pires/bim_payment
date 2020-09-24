@@ -68,8 +68,8 @@ namespace bim_payment.Controllers
 
                if(Autorizacao.result== "ERROR")
                 {
-                    return Redirect("https://localhost:44360/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
-                    //return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
+                    //return Redirect("https://localhost:44360/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
+                    return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
 
                 }
                 else
@@ -113,7 +113,7 @@ namespace bim_payment.Controllers
             catch (Exception)
             {
 
-                return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
+                return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY-UNKNOW");
                 //return Redirect("https://localhost:44360/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
             }
             
