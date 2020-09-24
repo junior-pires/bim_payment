@@ -50,49 +50,73 @@ namespace bim_payment.Controllers
         }
         public ActionResult PagarViaMasterCard(string SessioId, long id_produto,decimal valor,string oque_e)
         {
-            string status = "FAILED";
-            string orderID = RandomStringNumber();
-            string transationID = RandomStringNumber();
-
-            RestClient restClient = new RestClient("https://test-gateway.mastercard.com");
-            RestRequest authorizationRequest = new RestRequest("/api/rest/version/54/merchant/22599/order/" + orderID + "/transaction/" + transationID, Method.PUT);
-            authorizationRequest.AddHeader("Content-Type", "application/json");
-            authorizationRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6MzBlYzZkOGY1MmI3YzJiY2YzOGZkNWZlNzRjNDhkMzA=");
-
-            var data = new PayRequest() { apiOperation = "AUTHORIZE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" }, order = new PayRequest.Order() { amount = valor, currency = "MZN" } };
-            authorizationRequest.AddJsonBody(data);
-            var response = restClient.Execute<PayResponse>(authorizationRequest);
-            PayResponse Autorizacao = response.Data;
-            
-            if(Autorizacao.order.status== "AUTHORIZED")
+            try
             {
-                RestRequest CaptureRequest = new RestRequest("/api/rest/version/54/merchant/22599/order/" + Autorizacao.order.id + "/transaction/" + RandomStringNumber(), Method.PUT);
-                CaptureRequest.AddHeader("Content-Type", "application/json");
-                CaptureRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6MzBlYzZkOGY1MmI3YzJiY2YzOGZkNWZlNzRjNDhkMzA=");
+                string status = "FAILED";
+                string orderID = RandomStringNumber();
+                string transationID = RandomStringNumber();
 
-                var data2 = new PayRequest() { transaction = new PayRequest.Transaction() { amount = valor, currency = "MZN" }, apiOperation = "CAPTURE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" } };
-                CaptureRequest.AddJsonBody(data2);
-                var captura = restClient.Execute<PayResponse>(CaptureRequest);
-                PayResponse capturacao = captura.Data;
+                RestClient restClient = new RestClient("https://millenniumbim.gateway.mastercard.com");
+                RestRequest authorizationRequest = new RestRequest("/api/rest/version/54/merchant/22599/order/" + orderID + "/transaction/" + transationID, Method.PUT);
+                authorizationRequest.AddHeader("Content-Type", "application/json");
+                authorizationRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6YzQwZjE1MTQ0MmQ3ZmViYWQ2MDZmZDY1YjFkNjYzZDY=");
 
-                if (capturacao.order.status == "CAPTURED")
+                var data = new PayRequest() { apiOperation = "AUTHORIZE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" }, order = new PayRequest.Order() { amount = valor, currency = "MZN" } };
+                authorizationRequest.AddJsonBody(data);
+                var response = restClient.Execute<PayResponse>(authorizationRequest);
+                PayResponse Autorizacao = response.Data;
+
+               if(Autorizacao.result== "ERROR")
                 {
-                     status = "CAPTURED";
+                    return Redirect("https://localhost:44360/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
+                    //return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
+
+                }
+                else
+                {
+                    if (Autorizacao.order.status == "AUTHORIZED")
+                    {
+                        RestRequest CaptureRequest = new RestRequest("/api/rest/version/54/merchant/22599/order/" + Autorizacao.order.id + "/transaction/" + RandomStringNumber(), Method.PUT);
+                        CaptureRequest.AddHeader("Content-Type", "application/json");
+                        CaptureRequest.AddHeader("Authorization", $"Basic MjI1OTk6OWJkNThmMzVjOWQzMjY4ZWE5YzliYjE3YzUwMWE2NWI=");
+
+                        var data2 = new PayRequest() { transaction = new PayRequest.Transaction() { amount = valor, currency = "MZN" }, apiOperation = "CAPTURE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" } };
+                        CaptureRequest.AddJsonBody(data2);
+                        var captura = restClient.Execute<PayResponse>(CaptureRequest);
+                        PayResponse capturacao = captura.Data;
+
+                        if (capturacao.order.status == "CAPTURED")
+                        {
+                            status = "CAPTURED";
+                        }
+                    }
+                }
+                
+
+
+                   
+
+
+                if (status == "CAPTURED")
+                {
+                    return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&oque_e=" + oque_e);
+                    //return Redirect("https://localhost:44360/payment/compra?id_produto=" + id_produto + "&oque_e=" + oque_e);
+
+                }
+                else
+                {
+
+                    return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro="+status);
+                    //return Redirect("https://localhost:44360/PubMusica/PagamentoFalhou?erro=" + status);
                 }
             }
-
-
-            if (status == "CAPTURED")
-            {
-                return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&oque_e=" + oque_e);
-                //return Redirect("https://localhost:44360/payment/compra?id_produto=" + id_produto + "&oque_e="+ oque_e);
-                
-            }
-            else
+            catch (Exception)
             {
 
-                return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro="+status);
+                return Redirect("https://www.mussika.co.mz/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
+                //return Redirect("https://localhost:44360/PubMusica/PagamentoFalhou?erro=Houve um erro inesperado, volte a tentar mais tarde ou conatcte o administrador. Codigo do Erro: APIPAY01");
             }
+            
         }
         public ActionResult About()
         {

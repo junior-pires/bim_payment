@@ -11,17 +11,17 @@
 </style>
 <!-- CREATE THE HTML FOR THE PAYMENT PAGE -->
 <div class="container body-content col-md-4 col-md-offset-4">
-    
+
     <br />
     <br />
     <br />
     <div>Insira seus detalhes de pagamento:</div>
     <h3>Cartão de crédito</h3>
-    <div>Numero do Cartão: <input type="text" id="card-number" class="input-field" title="card number" placeholder="" aria-label="enter your card number" value="" tabindex="1" readonly></div>
-    <div>Mes que Expira:<input type="text" id="expiry-month" class="input-field" title="expiry month" aria-label="two digit expiry month" value="" tabindex="2" readonly></div>
-    <div>Ano que expira:<input type="text" id="expiry-year" class="input-field" title="expiry year" aria-label="two digit expiry year" value="" tabindex="3" readonly></div>
-    <div>Código de Segurança:<input type="text" id="security-code" class="input-field" title="security code" aria-label="three digit CCV security code" value="" tabindex="4" readonly></div>
-    <div>Nome do dono do Cartão:<input type="text" id="cardholder-name" class="input-field" title="cardholder name" aria-label="enter name on card" value="" tabindex="5" readonly></div>
+    <div>Numero do Cartão: <input type="text" id="card-number" class="input-field" title="card number" placeholder="Exemplo: 5204 7300 0000 2449" aria-label="enter your card number" value="" tabindex="1" readonly></div>
+    <div>Mes que Expira:<input type="text" id="expiry-month" class="input-field" title="expiry month" placeholder="Exemplo: 12" aria-label="two digit expiry month" value="" tabindex="2" readonly></div>
+    <div>Ano que expira:<input type="text" id="expiry-year" class="input-field" title="expiry year" placeholder="Exemplo: 25" aria-label="two digit expiry year" value="" tabindex="3" readonly></div>
+    <div>Código de Segurança:<input type="text" id="security-code" class="input-field" placeholder="Exemplo: 244" title="security code" aria-label="three digit CCV security code" value="" tabindex="4" readonly></div>
+    <div>Nome do dono do Cartão:<input type="text" id="cardholder-name" class="input-field" placeholder="Exemplo: Propriétario do Cartão" title="cardholder name" aria-label="enter name on card" value="" tabindex="5" readonly></div>
     <input type="button" value="Finalizar Pagamento" onclick="pay('card');" />
 </div>
 @*<div>Please enter your payment details:</div>
@@ -33,8 +33,12 @@
     <div>Cardholder Name:<input type="text" id="cardholder-name" class="input-field" title="cardholder name" aria-label="enter name on card" value="" tabindex="5" readonly></div>
     <input type="button" value="Pay with Payment Page" onclick="pay('card');" />*@
 <script src="~/Content/jquery-2.2.0.min.js"></script>
-<script src="https://test-millenniumbim.mtf.gateway.mastercard.com/form/version/54/merchant/22599/session.js"></script>
+<script src="https://millenniumbim.gateway.mastercard.com/form/version/54/merchant/22599/session.js"></script>
 <script src="~/Content/loadingoverlay.min.js"></script>
+<script src="~/Content/jquery-confirm.min.js"></script>
+<script src="~/Content/Dialogos.js"></script>
+
+
 <script type="text/javascript">
 
 
@@ -68,7 +72,15 @@
 
                 if (response.status) {
                     if ("ok" == response.status) {
+
                         debugger
+                        if (!response.sourceOfFunds.provided.card.securityCode) {
+                            debugger
+                            $.LoadingOverlay("hide", true);
+                            informarErro("Codigo de seguranca Invalido");
+                            throw new Error('');
+                        }
+
                         //alert("Session updated with data: " + response.session.id);
                         location.href = '/Home/PagarViaMasterCard?SessioId=' + response.session.id+"&id_produto=@ViewBag.id&valor=@ViewBag.valor&oque_e=@ViewBag.oque_e";
                         //check if the security code was provided by the user
@@ -84,16 +96,25 @@
 
                         console.log("Session update failed with field errors.");
                         if (response.errors.cardNumber) {
-                            console.log("Card number invalid or missing.");
+                            $.LoadingOverlay("hide", true);
+                            informarErro("Numero de Cartao Invalido");
+                            throw new Error('');
                         }
                         if (response.errors.expiryYear) {
-                            console.log("Expiry year invalid or missing.");
+                            $.LoadingOverlay("hide", true);
+                            informarErro("Ano informado e Inválido, por favor informe os ultimos dois digitos, Exemplo: Ano 2025 deve ser: 25");
+                            throw new Error('');
                         }
                         if (response.errors.expiryMonth) {
-                            console.log("Expiry month invalid or missing.");
+                            $.LoadingOverlay("hide", true);
+                            informarErro("Mes Invalido");
+                            throw new Error('');
                         }
+                       
                         if (response.errors.securityCode) {
-                            console.log("Security code invalid.");
+                            $.LoadingOverlay("hide", true);
+                            informarErro("Codigo de seguranca Invalido");
+                            throw new Error('');
                         }
                     } else if ("request_timeout" == response.status) {
                         console.log("Session update failed with request timeout: " + response.errors.message);
@@ -119,6 +140,23 @@
     });
 
     function pay() {
+       
+        //if ($('#number').val().length !=15 ) {
+        //    informarErro("Numero de Cartao Invalido");
+        //    throw new Error('');
+        //}
+        //if ($('#security-code').length < 2) {
+        //    informarErro("Codigo de seguranca Invalido");
+        //    throw new Error('');
+        //}
+        //if ($('#expiry-month').length < 1) {
+        //    informarErro("Mes Invalido");
+        //    throw new Error('');
+        //}
+        //if ($('#expiry-year').length < 2) {
+        //    informarErro("Ano Informado e Invalido,por favor informe os ultimos dois digitos, Exemplo:Ano 2025 deve ser: 25");
+        //    throw new Error('');
+        //}
         $.LoadingOverlay("show");
         // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
         PaymentSession.updateSessionFromForm('card');
