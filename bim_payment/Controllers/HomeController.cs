@@ -78,7 +78,7 @@ namespace bim_payment.Controllers
                     {
                         RestRequest CaptureRequest = new RestRequest("/api/rest/version/54/merchant/22599/order/" + Autorizacao.order.id + "/transaction/" + RandomStringNumber(), Method.PUT);
                         CaptureRequest.AddHeader("Content-Type", "application/json");
-                        CaptureRequest.AddHeader("Authorization", $"Basic MjI1OTk6OWJkNThmMzVjOWQzMjY4ZWE5YzliYjE3YzUwMWE2NWI=");
+                        CaptureRequest.AddHeader("Authorization", $"Basic bWVyY2hhbnQuMjI1OTk6YzQwZjE1MTQ0MmQ3ZmViYWQ2MDZmZDY1YjFkNjYzZDY=");
 
                         var data2 = new PayRequest() { transaction = new PayRequest.Transaction() { amount = valor, currency = "MZN" }, apiOperation = "CAPTURE", session = new PayRequest.Session() { id = SessioId }, sourceOfFunds = new PayRequest.SourceOfFunds() { type = "CARD" } };
                         CaptureRequest.AddJsonBody(data2);
