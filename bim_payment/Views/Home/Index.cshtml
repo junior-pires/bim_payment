@@ -82,7 +82,7 @@
                         }
 
                         //alert("Session updated with data: " + response.session.id);
-                        location.href = '/Home/PagarViaMasterCard?SessioId=' + response.session.id+"&id_produto=@ViewBag.id&valor=@ViewBag.valor&oque_e=@ViewBag.oque_e";
+                        location.href = '/Home/PagarViaMasterCard?SessioId=' + response.session.id + "&id_produto=@ViewBag.id&valor=@ViewBag.valor&oque_e=@ViewBag.oque_e" + "&checkIn=@ViewBag.checkIn" + "&checkOut=@ViewBag.checkOut" + "&tem_entrega=@ViewBag.tem_entrega" + "&id_transportadora=@ViewBag.id_transportadora"+ "&local_entrega=@ViewBag.local_entrega" + "&nome_destinatario=@ViewBag.nome_destinatario" + "&contacto_destinatario=@ViewBag.contacto_destinatario";
                         //check if the security code was provided by the user
                         if (response.sourceOfFunds.provided.card.securityCode) {
                             console.log("Security code was provided.");
@@ -110,7 +110,7 @@
                             informarErro("Mes Invalido");
                             throw new Error('');
                         }
-                       
+
                         if (response.errors.securityCode) {
                             $.LoadingOverlay("hide", true);
                             informarErro("Codigo de seguranca Invalido");
@@ -140,7 +140,7 @@
     });
 
     function pay() {
-       
+
         //if ($('#number').val().length !=15 ) {
         //    informarErro("Numero de Cartao Invalido");
         //    throw new Error('');

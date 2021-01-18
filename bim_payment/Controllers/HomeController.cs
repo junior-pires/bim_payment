@@ -11,12 +11,19 @@ namespace bim_payment.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index(long id, decimal valor,string oque_e)
+        public ActionResult Index(long id, decimal valor,string oque_e, string checkIn="", string checkOut="", bool tem_entrega = false, int id_transportadora = 0, string local_entrega = "", string nome_destinatario = "", string contacto_destinatario = "")
         {
 
             ViewBag.id = id;
             ViewBag.valor = valor;
             ViewBag.oque_e = oque_e;
+            ViewBag.checkIn = checkIn;
+            ViewBag.checkOut = checkOut;
+            ViewBag.tem_entrega = tem_entrega;
+            ViewBag.id_transportadora = id_transportadora;
+            ViewBag.local_entrega = local_entrega;
+            ViewBag.nome_destinatario = nome_destinatario;
+            ViewBag.contacto_destinatario = contacto_destinatario;
             return View();
 
         }
@@ -48,7 +55,7 @@ namespace bim_payment.Controllers
             builder.Append(RandomString(2, false));
             return builder.ToString();
         }
-        public ActionResult PagarViaMasterCard(string SessioId, long id_produto,decimal valor,string oque_e)
+        public ActionResult PagarViaMasterCard(string SessioId, long id_produto,decimal valor,string oque_e, string checkIn = "", string checkOut = "", bool tem_entrega = false, int id_transportadora = 0, string local_entrega = "", string nome_destinatario = "", string contacto_destinatario = "")
         {
             try
             {
@@ -99,7 +106,7 @@ namespace bim_payment.Controllers
 
                 if (status == "CAPTURED")
                 {
-                    return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&oque_e=" + oque_e);
+                    return Redirect("https://www.mussika.co.mz/payment/compra?id_produto=" + id_produto + "&valor=" + valor + "&oque_e=" + oque_e + "&checkIn="+checkIn + "&checkOut="+checkOut+ "&tem_entrega ="+ tem_entrega+ "&id_transportadora ="+ id_transportadora + "&local_entrega=" + local_entrega + "&nome_destinatario=" + nome_destinatario + "&contacto_destinatario=" + contacto_destinatario);
                     //return Redirect("https://localhost:44360/payment/compra?id_produto=" + id_produto + "&oque_e=" + oque_e);
 
                 }
